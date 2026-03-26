@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULMOAI SCAN</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+:root {
+    --primary: #00ffff;
+    --green: #22c55e;
+    --bg: #00040a;
+}
+
+body {
+    background: radial-gradient(circle at center, #020617, #000000);
+    color: #e2e8f0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Layout */
+.main {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+/* Card */
+.card-custom {
+    background: rgba(10,15,25,0.5);
+    backdrop-filter: blur(25px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 
+        0 0 60px rgba(0,255,255,0.05),
+        inset 0 0 10px rgba(255,255,255,0.02);
+}
+
+/* SVG Lungs */
+.lungs-container {
+    width: 350px;
+    display: flex;
+    justify-content: center;
+}
+
+.lungs-svg {
+    width: 100%;
+}
+
+.lung {
+    fill: rgba(0,255,255,0.15);
+    stroke: #00ffff;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 10px #00ffff);
+}
+
+/* breathing */
+.left {
+    transform-origin: right center;
+    animation: breatheLeft 3s infinite ease-in-out;
+}
+.right {
+    transform-origin: left center;
+    animation: breatheRight 3s infinite ease-in-out;
+}
+
+@keyframes breatheLeft {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+@keyframes breatheRight {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+}
+
+/* Upload */
+.image-part {
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 10px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    margin-bottom: 15px;
+}
+.image-part img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Buttons */
+.btn-tech {
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    background: transparent;
+    border-radius: 10px;
+}
+.btn-tech:hover {
+    background: rgba(0,255,255,0.1);
+    box-shadow: 0 0 20px var(--primary);
+}
+
+.btn-predict {
+    border-color: var(--green);
+    color: var(--green);
+}
+.btn-predict:hover {
+    background: rgba(34,197,94,0.1);
+    box-shadow: 0 0 20px var(--green);
+}
+
+/* Result */
+.result-box {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #000;
+    border: 1px solid rgba(0,255,255,0.2);
+}
+
+/* Loader */
+#loading {
+    display:none;
+    position:fixed;
+    inset:0;
+    background: rgba(0,0,0,0.9);
+    z-index:999;
+}
+.loader {
+    border: 6px solid #222;
+    border-top: 6px solid #00ffff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    margin:auto;
+    margin-top:20%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    100% { transform: rotate(360deg);}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container main">
+<div class="row w-100">
+
+    <!-- LEFT: LUNGS -->
+    <div class="col-lg-6 d-flex justify-content-center align-items-center">
+        <div class="lungs-container">
+
+            <svg viewBox="0 0 200 200" class="lungs-svg">
+
+                <!-- LEFT LUNG -->
+                <path class="lung left"
+                    d="M90 40 C60 40, 40 80, 50 120 C60 160, 90 160, 95 130 L95 60 Z"/>
+
+                <!-- RIGHT LUNG -->
+                <path class="lung right"
+                    d="M110 40 C140 40, 160 80, 150 120 C140 160, 110 160, 105 130 L105 60 Z"/>
+
+                <!-- TRACHEA -->
+                <rect x="95" y="20" width="10" height="30" fill="#00ffff"/>
+
+            </svg>
+
+        </div>
+    </div>
+
+    <!-- RIGHT: UI -->
+    <div class="col-lg-6 text-center">
+
+        <h2 class="mb-3">🧠 PULMOAI SCAN</h2>
+        <p class="text-secondary mb-4">AI Chest Cancer Detection System</p>
+
+        <div class="card-custom">
+
+            <div class="image-part">
+                <img id="preview" style="display:none;">
+                <span id="placeholder">Upload CT Image</span>
+            </div>
+
+            <input type="file" id="fileinput" class="form-control mb-3">
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-tech w-50" onclick="uploadImage()">Upload</button>
+                <button class="btn btn-tech btn-predict w-50" onclick="predict()">Predict</button>
+            </div>
+
+            <!-- RESULT -->
+            <div id="result"></div>
+
+        </div>
+    </div>
+
+</div>
+</div>
+
+<div id="loading">
+    <div class="loader"></div>
+</div>
+
+<script>
+let base_data = "";
+
+/* Upload */
+function uploadImage() {
+    const file = document.getElementById("fileinput").files[0];
+    if (!file) return alert("Upload image first");
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById("preview").src = e.target.result;
+        document.getElementById("preview").style.display = "block";
+        document.getElementById("placeholder").style.display = "none";
+
+        const img = new Image();
+        img.onload = function() {
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            base_data = canvas.toDataURL("image/jpeg")
+                .replace(/^data:image.+;base64,/, "");
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+/* Predict */
+function predict() {
+    if (!base_data) return alert("Upload image first");
+
+    document.getElementById("loading").style.display = "block";
+
+    // ⚠️ اربطه بالـ API الحقيقي هنا
+    setTimeout(() => {
+
+        document.getElementById("loading").style.display = "none";
+
+        const isCancer = Math.random() > 0.5;
+
+        // تغيير لون الرئة حسب النتيجة
+        document.querySelectorAll('.lung').forEach(l => {
+            if(isCancer){
+                l.style.fill = "rgba(255,0,0,0.4)";
+                l.style.stroke = "red";
+            } else {
+                l.style.fill = "rgba(0,255,255,0.2)";
+                l.style.stroke = "#00ffff";
+            }
+        });
+
+        document.getElementById("result").innerHTML = `
+            <div class="result-box">
+                <h4 style="color:${isCancer ? 'red' : '#22c55e'};">
+                    ${isCancer ? '⚠ Cancer Detected' : '✔ Normal'}
+                </h4>
+                <p>Confidence: ${(Math.random()*10+90).toFixed(2)}%</p>
+            </div>
+        `;
+
+    }, 2000);
+}
+</script>
+
+</body>
+</html>
