@@ -261,7 +261,7 @@ function predict() {
         document.getElementById("result").innerHTML = `
             <div class="result-box">
                 <h4 style="color:${isCancer ? 'red' : '#22c55e'};">
-                    ${isCancer ? '⚠ Cancer Detected' : '✔ Normal'}
+                    ${isCancer ? '⚠ Cancer Suspected' : '✔ Normal'}
                 </h4>
                 <p>Confidence: ${(Math.random()*10+90).toFixed(2)}%</p>
             </div>
