@@ -86,7 +86,7 @@ Fine-tunes the model on the CT scan data with configurable augmentation and hype
 |----------------|-------|
 | Image Size | 224 × 224 × 3 |
 | Batch Size | 16 |
-| Epochs | 2 |
+| Epochs | 15 |
 | Learning Rate | 0.02 |
 | Augmentation | ✅ Enabled |
 | Pre-trained Weights | ImageNet |
