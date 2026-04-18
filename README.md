@@ -13,6 +13,7 @@
 [![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-945DD6?style=for-the-badge&logo=dvc&logoColor=white)](https://dvc.org)
 [![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)](https://mlflow.org)
 [![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](http://13.221.125.15:8080/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -21,7 +22,7 @@
 
 <br/>
 
-[🏗️ Architecture](#️-system-architecture) · [⚡ Quick Start](#-getting-started) · [📖 Documentation](#-table-of-contents) · [📊 Results](#-results)
+[🏗️ Architecture](#️-system-architecture) · [⚡ Quick Start](#-getting-started) · [📖 Documentation](#-table-of-contents) · [📊 Results](#-results) · [🌐 Live Demo](http://13.221.125.15:8080/)
 
 ---
 
@@ -65,6 +66,7 @@ The project is built with production engineering at its core: a reproducible DVC
 | 🐳 **Dockerized** | Consistent dev-to-prod containerization |
 | ☁️ **AWS Deployment** | Auto-deployed to EC2 via ECR on every push to `main` |
 | ⚙️ **GitHub Actions CI/CD** | Fully automated build → test → push → deploy workflow |
+| 🚀 **Live Demo** | [Try it live on AWS EC2 →](http://13.221.125.15:8080/) |
 
 ---
 
@@ -330,7 +332,7 @@ stateDiagram-v2
 
 ## 🌐 API Reference
 
-**Base URL:** `http://<your-ec2-host>:8080`
+**Base URL:** [http://13.221.125.15:8080](http://13.221.125.15:8080/)
 
 ### `POST /predict`
 
@@ -339,7 +341,7 @@ Upload a chest CT scan image and receive a cancer classification.
 **Request:** `multipart/form-data`
 
 ```bash
-curl -X POST http://localhost:8080/predict \
+curl -X POST http://13.221.125.15:8080/predict \
   -F "file=@chest_scan.jpg"
 ```
 
@@ -432,6 +434,16 @@ docker run -p 8080:8080 chest-cancer-api
 ### 6. Access the Web UI
 
 Open your browser at `http://localhost:8080` and upload a chest CT scan image.
+
+---
+
+### 🌐 Live Demo
+
+The API is deployed and running live on AWS EC2:
+
+👉 **[http://13.221.125.15:8080/](http://13.221.125.15:8080/)**
+
+Upload a chest CT scan image and get a real-time cancer classification prediction — no setup required.
 
 ---
 
