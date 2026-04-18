@@ -457,7 +457,7 @@ docker push omarhatemmohamed/chest-cancer-app
 
 ### Why Minikube?
 
-Due to AWS EC2 quota limitations (fleet request limits and NodeGroup creation failures), deployment was completed locally using **Minikube** as a production-equivalent Kubernetes environment.
+Due to AWS EC2 quota limitations on the free-tier account (EC2 Fleet Request limits and EKS NodeGroup creation failures in `eu-west-1`), deployment was completed locally using **Minikube** as a production-equivalent Kubernetes environment. The full EKS architecture, manifests, and deployment workflow were designed and validated — the cluster is migration-ready once quota is approved.
 
 ### Manifests
 
@@ -635,11 +635,48 @@ Follow this workflow when modifying any pipeline stage:
 - Missing `Dockerfile` discovered mid-deployment
 - Large final image size (~2.6 GB) due to TensorFlow dependencies
 
-### 4. AWS Deployment Failure
-- EC2 instance quota limits exceeded
-- Fleet request limits blocked instance creation
-- EKS NodeGroup creation failed entirely
-- **Resolution:** Pivoted to Minikube as a production-equivalent local Kubernetes environment
+### 4. AWS EKS Deployment Failure — EC2 vCPU Quota Exhausted
+
+This was the most operationally complex challenge of the project and resulted in hands-on experience with real AWS infrastructure limits and the support escalation process.
+
+**What happened:**
+
+When attempting to provision an EKS cluster (`chest-prod-2`) in `eu-west-1` using `eksctl`, the cluster control plane was created successfully via CloudFormation, but the managed node group (`ng-c2b5e0b7`) entered a `CREATE_FAILED` / `ROLLBACK_IN_PROGRESS` state after approximately 35 minutes of waiting.
+
+```
+Error: exceeded max wait time for StackCreateComplete waiter
+failed to create cluster "chest-prod-2"
+```
+
+**Root cause — identified via CloudFormation Events:**
+
+```
+AsgInstanceLaunchFailures: You've reached your quota for maximum
+Fleet Requests for this account. Launching EC2 instance failed.
+```
+
+The free-tier AWS account had a **0 vCPU quota** for Running On-Demand Standard instances in `eu-west-1`. Even a single `t3.micro` node (2 vCPUs) could not be launched.
+
+**Debugging steps taken:**
+
+1. Inspected the CloudFormation stack events in the AWS console to identify the exact failure resource (`ManagedNodeGroup`) and error code (`AsgInstanceLaunchFailures`)
+2. Navigated to **Service Quotas → Amazon EC2 → Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances**
+3. Confirmed the applied quota in `eu-west-1` was **0 vCPUs** with **0 utilization** — the bottleneck
+4. Submitted a quota increase request for **15 vCPUs** in `eu-west-1`
+5. AWS opened a support case (Case `177649325600882`) for manual review, as free-tier accounts do not receive automatic approval for quota increases
+6. Added a use-case justification to the support case to expedite review
+
+**Resolution:**
+
+While awaiting quota approval, the failed CloudFormation stacks were cleaned up:
+
+```bash
+eksctl delete cluster --name chest-prod-2 --region eu-west-1
+```
+
+Kubernetes deployment was then completed using **Minikube** as a production-equivalent local environment. The EKS manifests (`deployment.yaml`, `service.yaml`) remain unchanged and are fully compatible with EKS — migration requires only re-running the `eksctl create cluster` command once the quota is approved.
+
+**Key takeaway:** Cloud infrastructure limits are a real-world operational concern, not just a theoretical one. Diagnosing the failure required reading CloudFormation events, understanding AWS quota scoping per-region, and knowing the difference between automatic and manual quota approval paths.
 
 ---
 
@@ -649,7 +686,9 @@ Follow this workflow when modifying any pipeline stage:
 - Docker image size optimization challenges with heavy ML dependencies
 - Kubernetes resource management and NodePort service exposure patterns
 - Critical importance of health check endpoints in container orchestration
-- How to handle cloud infrastructure quota limits gracefully
+- How to diagnose and handle AWS CloudFormation stack failures
+- How EC2 vCPU quotas are scoped per-region and how to request increases
+- How to pivot gracefully from cloud to local Kubernetes without losing deployment fidelity
 
 ---
 
@@ -660,7 +699,7 @@ Follow this workflow when modifying any pipeline stage:
 | **Multi-stage Docker build** | Reduce image size significantly below ~2.6 GB |
 | **Model on S3** | Store `.h5` in S3 instead of baking it into the container |
 | **Full CI/CD to K8s** | Extend GitHub Actions to auto-deploy to Kubernetes |
-| **AWS EKS / ECS** | Migrate from Minikube to cloud Kubernetes after quota increase |
+| **AWS EKS migration** | Migrate from Minikube to EKS once eu-west-1 vCPU quota is approved |
 | **Monitoring** | Add Prometheus + Grafana dashboards for inference metrics |
 
 ---
@@ -683,6 +722,7 @@ Follow this workflow when modifying any pipeline stage:
 | **Kubernetes Orchestration** | Minikube Deployment + NodePort Service with readiness probes |
 | **CI/CD Automation** | GitHub Actions: test → build → push ECR → deploy EC2 |
 | **Cloud Deployment** | Live inference on AWS EC2 with image from AWS ECR |
+| **Cloud Infrastructure Debugging** | Diagnosed EKS NodeGroup failure via CloudFormation events; navigated AWS quota system and support escalation |
 
 </div>
 
