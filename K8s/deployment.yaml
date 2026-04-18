@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chest-cancer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chest-cancer
+  template:
+    metadata:
+      labels:
+        app: chest-cancer
+    spec:
+      containers:
+      - name: chest-cancer-container
+        image: chest-cancer-app
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080

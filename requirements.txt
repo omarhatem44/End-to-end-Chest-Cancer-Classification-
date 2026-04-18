@@ -17,4 +17,3 @@ scipy
 Flask
 Flask-Cors
 dagshub==0.6.8
--e .
