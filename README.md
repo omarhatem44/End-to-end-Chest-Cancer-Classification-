@@ -247,52 +247,70 @@ sequenceDiagram
 ## 📁 Project Structure
 
 ```
-End-to-end-Chest-Cancer-Classification/
-│
-├── .github/
-│   └── workflows/                  # GitHub Actions CI/CD pipeline
-│
-├── .dvc/                           # DVC configuration & cache
-├── dvc.yaml                        # Pipeline stage definitions
-├── params.yaml                     # Model hyperparameters
-│
-├── config/
-│   └── config.yaml                 # Path & artifact configuration
-│
-├── k8s/
-│   ├── deployment.yaml             # Kubernetes Deployment manifest
-│   └── service.yaml                # Kubernetes NodePort Service manifest
-│
-├── src/cnnClassifier/
-│   ├── components/                 # Pipeline stage implementations
-│   │   ├── data_ingestion.py       # Dataset download & extraction
-│   │   ├── prepare_base_model.py   # VGG16 model construction
-│   │   ├── model_trainer.py        # Training loop + augmentation
-│   │   └── model_evaluation.py     # Metrics logging + MLflow registry
-│   │
-│   ├── pipeline/                   # Stage orchestration scripts
-│   │   ├── stage_01_data_ingestion.py
-│   │   ├── stage_02_prepare_base_model.py
-│   │   ├── stage_03_model_training.py
-│   │   └── stage_04_model_evaluation.py
-│   │
-│   ├── entity/                     # Dataclass configs for each stage
-│   ├── config/                     # ConfigurationManager
-│   └── utils/                      # Shared utilities
-│
-├── model/
-│   └── model.h5                    # Trained VGG16 model weights
-│
-├── research/                       # Jupyter notebooks for EDA & prototyping
-├── templates/                      # Jinja2 HTML templates for web UI
-│
-├── app.py                          # Flask REST API entry point
-├── main.py                         # Full pipeline runner
-├── scores.json                     # Latest evaluation metrics
-├── Dockerfile
-├── requirements.txt
-├── setup.py
-└── template.py                     # Project scaffolding script
+├── 📁 .dvc
+│   ├── ⚙️ .gitignore
+│   └── 📄 config
+├── 📁 .github
+│   └── 📁 workflows
+│       └── ⚙️ main.yaml
+├── 📁 K8s
+│   ├── ⚙️ deployment.yaml
+│   └── ⚙️ service.yaml
+├── 📁 config
+│   └── ⚙️ config.yaml
+├── 📁 logs
+├── 📁 model
+│   └── 📄 model.h5
+├── 📁 research
+│   ├── 📄 01_data_ingestion.ipynb
+│   ├── 📄 02_prepare_base_model.ipynb
+│   ├── 📄 03_model_trainer.ipynb
+│   ├── 📄 04_model_evaluation_with_mlflow.ipynb
+│   └── 📄 trials.ipynb
+├── 📁 src
+│   └── 📁 cnnClassifier
+│       ├── 📁 components
+│       │   ├── 🐍 __init__.py
+│       │   ├── 🐍 data_ingestion.py
+│       │   ├── 🐍 model_evaluation_mlflow.py
+│       │   ├── 🐍 model_trainer.py
+│       │   └── 🐍 prepare_base_model.py
+│       ├── 📁 config
+│       │   ├── 🐍 __init__.py
+│       │   └── 🐍 configuration.py
+│       ├── 📁 constants
+│       │   └── 🐍 __init__.py
+│       ├── 📁 entity
+│       │   ├── 🐍 __init__.py
+│       │   └── 🐍 config_entity.py
+│       ├── 📁 pipeline
+│       │   ├── 🐍 __init__.py
+│       │   ├── 🐍 prediction.py
+│       │   ├── 🐍 stage_01_data_ingestion.py
+│       │   ├── 🐍 stage_02_prepare_base_model.py
+│       │   ├── 🐍 stage_03_trainer_model.py
+│       │   └── 🐍 stage_04_model_evaluation.py
+│       ├── 📁 utils
+│       │   ├── 🐍 __init__.py
+│       │   └── 🐍 common.py
+│       └── 🐍 __init__.py
+├── 📁 templates
+│   └── 🌐 index.html
+├── ⚙️ .dockerignore
+├── ⚙️ .dvcignore
+├── ⚙️ .gitignore
+├── 🐳 Dockerfile
+├── 📄 LICENSE
+├── 📝 README.md
+├── 🐍 app.py
+├── 📄 chest-classifier.pem
+├── ⚙️ dvc.yaml
+├── 🐍 main.py
+├── ⚙️ params.yaml
+├── 📄 requirements.txt
+├── ⚙️ scores.json
+├── 🐍 setup.py
+└── 🐍 template.py
 ```
 
 ---
