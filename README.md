@@ -35,7 +35,7 @@
 ────────────────────────────────────────────────────────────── -->
 <!-- <img src="assets/demo.png" alt="Live demo of the chest cancer classifier" width="800"/> -->
 
-<img src="assets/architecture.png" alt="System architecture" width="900"/>
+<img src="Architecture ·.png" alt="System architecture" width="900"/>
 
 ---
 
@@ -92,7 +92,7 @@ The focus is not only model performance but **production-level deployment using 
 
 <div align="center">
 
-<img src="assets/results.png" alt="Model performance metrics" width="820"/>
+<img src="Results.png" alt="Model performance metrics" width="820"/>
 
 <br/>
 
@@ -124,7 +124,7 @@ The focus is not only model performance but **production-level deployment using 
 The system spans six integrated layers: data versioning, model training, experiment tracking, API serving, containerization, and Kubernetes orchestration.
 
 <div align="center">
-<img src="assets/architecture.png" alt="Full system architecture" width="960"/>
+<img src="Architecture ·.png" alt="Full system architecture" width="960"/>
 </div>
 
 <details>
