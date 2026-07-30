@@ -14,16 +14,28 @@
 [![DVC](https://img.shields.io/badge/DVC-Data%20Versioning-945DD6?style=for-the-badge&logo=dvc&logoColor=white)](https://dvc.org)
 [![MLflow](https://img.shields.io/badge/MLflow-Experiment%20Tracking-0194E2?style=for-the-badge&logo=mlflow&logoColor=white)](https://mlflow.org)
 [![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-AWS%20EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)](http://13.221.125.15:8080/)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-00C9A7?style=for-the-badge&logo=protondrive&logoColor=white)](https://omar-pulmoai.duckdns.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
 
 <br/>
 
-> **A production-grade MLOps pipeline for medical imaging** — classifying chest CT scans as cancerous or normal using a fine-tuned VGG16 model, with full experiment tracking, DVC-versioned pipeline, MLflow Model Registry, Docker containerization, and Kubernetes orchestration via Minikube.
+> **A production-grade MLOps pipeline for medical imaging** — classifying chest CT scans as **Cancer** or **Normal** using a fine-tuned VGG16 model, with full experiment tracking, a DVC-versioned pipeline, an MLflow Model Registry, Docker containerization, and Kubernetes orchestration via Minikube.
 
 <br/>
 
-[🏗️ Architecture](#️-system-architecture) · [⚡ Quick Start](#-getting-started) · [📖 Documentation](#-table-of-contents) · [📊 Results](#-results) · [🌐 Live Demo](http://13.221.125.15:8080/)
+[🏗️ Architecture](#️-system-architecture) · [⚡ Quick Start](#-getting-started) · [📊 Results](#-results) · [🌐 Live Demo](https://omar-pulmoai.duckdns.org)
+
+<br/>
+
+<!-- ─────────────────────────────────────────────────────────────
+  HERO IMAGE — replace with a screenshot or GIF of the live UI.
+  1. Screenshot (or record a GIF) of the app predicting a scan.
+  2. Save as assets/demo.png (or assets/demo.gif).
+  3. Uncomment the line below.
+────────────────────────────────────────────────────────────── -->
+<!-- <img src="assets/demo.png" alt="Live demo of the chest cancer classifier" width="800"/> -->
+
+<img src="assets/architecture.png" alt="System architecture" width="900"/>
 
 ---
 
@@ -32,145 +44,139 @@
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
+- [Results](#-results)
 - [System Architecture](#️-system-architecture)
 - [ML Pipeline](#-ml-pipeline-dvc)
-- [CI/CD Pipeline](#️-cicd-pipeline)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
 - [Model Details](#-model-details)
 - [MLflow Model Registry](#-mlflow-model-registry)
 - [Backend API Reference](#-backend-api-reference)
-- [Frontend UI](#️-frontend-ui)
 - [Containerization](#-containerization-docker)
 - [Kubernetes Deployment](#️-kubernetes-deployment-minikube)
-- [Results](#-results)
+- [Live Deployment (HTTPS)](#-live-deployment-https)
 - [Getting Started](#-getting-started)
 - [Development Workflow](#-development-workflow)
 - [Challenges Faced](#️-challenges-faced)
 - [Key Learnings](#-key-learnings)
 - [Future Improvements](#-future-improvements)
-- [MLOps Skills Demonstrated](#-mlops-skills-demonstrated)
 - [Author](#-author)
 
 ---
 
 ## 🔍 Overview
 
-**End-to-End Chest Cancer Classification** is a full-stack medical imaging MLOps system. It takes chest CT scan images as input and classifies them as **Adenocarcinoma**, **Large Cell Carcinoma**, **Squamous Cell Carcinoma**, or **Normal** — using a fine-tuned **VGG16** convolutional neural network.
+**End-to-End Chest Cancer Classification** is a full-stack medical imaging MLOps system. It takes a chest CT scan image as input and classifies it as **Cancer** or **Normal**, using a fine-tuned **VGG16** convolutional neural network.
 
-The focus of this project is not only model performance but also **production-level deployment using MLOps practices**: a reproducible DVC pipeline, MLflow experiment tracking with a Model Registry, a hardened Flask inference API, Docker containerization, and Kubernetes orchestration via Minikube.
+The focus is not only model performance but **production-level deployment using MLOps practices**: a reproducible DVC pipeline, MLflow experiment tracking with a Model Registry, a hardened Flask inference API, Docker containerization, Kubernetes orchestration via Minikube, and a public HTTPS endpoint behind an Nginx reverse proxy.
 
 ### ✨ Key Highlights
 
 | Feature | Description |
 |---|---|
-| 🧠 **VGG16 Transfer Learning** | Fine-tuned deep CNN on chest CT scan imagery for cancer detection |
-| 🔬 **Medical Imaging Pipeline** | End-to-end from raw CT data to production-ready inference |
-| 📊 **MLflow Model Registry** | Environment-gated model promotion: Staging → Production |
+| 🧠 **VGG16 Transfer Learning** | Fine-tuned deep CNN on chest CT scan imagery |
+| 🔬 **Binary Cancer Detection** | Classifies each scan as Cancer or Normal |
+| 📊 **MLflow Model Registry** | Environment-gated promotion: Staging → Production |
 | 🔁 **DVC Pipeline** | Reproducible 4-stage pipeline tracked with `dvc.yaml` |
-| 🧪 **Test Suite** | pytest-based unit and integration testing for pipeline reliability |
-| 🌐 **Flask REST API** | Hardened inference endpoint with health check and CORS support |
-| 🐳 **Dockerized** | Gunicorn-served container pushed to Docker Hub |
-| ☸️ **Kubernetes Deployment** | Deployed on Minikube with Deployment + NodePort Service YAMLs |
-| ⚙️ **GitHub Actions CI/CD** | Fully automated build → test → push → deploy workflow |
-| 🚀 **Live Demo** | [Try it live on AWS EC2 →](http://13.221.125.15:8080/) |
+| 🧪 **Test Suite** | pytest-based unit and integration testing |
+| 🌐 **Flask REST API** | Hardened inference endpoint with health check and CORS |
+| 🐳 **Dockerized** | Gunicorn-served container |
+| ☸️ **Kubernetes** | Minikube Deployment + NodePort Service |
+| 🔒 **HTTPS in Production** | Nginx reverse proxy + Let's Encrypt on a custom domain |
+| ⚙️ **GitHub Actions CI/CD** | Automated build → test → push → deploy |
+| 🚀 **Live Demo** | [Try it live →](https://omar-pulmoai.duckdns.org) |
+
+---
+
+## 📊 Results
+
+<div align="center">
+
+<img src="assets/results.png" alt="Model performance metrics" width="820"/>
+
+<br/>
+
+| Metric | Value |
+|---|---|
+| **Test Accuracy** | **86.27%** |
+| **Test Loss** | **0.3371** |
+
+</div>
+
+> 📈 Full experiment history, metric curves, and model-version comparisons are tracked in **MLflow on DagsHub**:
+> [dagshub.com/omarhatem44/End-to-end-Chest-Cancer-Classification.mlflow](https://dagshub.com/omarhatem44/End-to-end-Chest-Cancer-Classification.mlflow/#/experiments)
+
+### Testing & Validation
+
+| Scenario | Status |
+|---|---|
+| UI image upload | ✅ |
+| API JSON response | ✅ |
+| Model inference | ✅ |
+| Docker container execution | ✅ |
+| Kubernetes service exposure | ✅ |
+| HTTPS endpoint + auto-renewing cert | ✅ |
 
 ---
 
 ## 🏗️ System Architecture
 
-The system is organized into six integrated layers: data versioning, model training, experiment tracking, API serving, containerization, and Kubernetes orchestration.
+The system spans six integrated layers: data versioning, model training, experiment tracking, API serving, containerization, and Kubernetes orchestration.
 
-```
-User → Web UI → Flask API → ML Model → Prediction → Response
-                          ↓
-                     Docker Container
-                          ↓
-                     Kubernetes (Minikube)
-```
+<div align="center">
+<img src="assets/architecture.png" alt="Full system architecture" width="960"/>
+</div>
+
+<details>
+<summary>📐 View as Mermaid diagram</summary>
 
 ```mermaid
 flowchart TB
     subgraph DATA["📦  Data Layer"]
-        RAW["🗂️ Raw CT Scan Data\nChest Cancer Dataset"]
-        DVC_STORE["🔄 DVC Remote\nData Versioning"]
-        RAW --> DVC_STORE
+        RAW["🗂️ Raw CT Scan Data"] --> DVC_STORE["🔄 DVC Remote"]
     end
-
-    subgraph PIPELINE["🔁  ML Pipeline  •  DVC Orchestrated"]
+    subgraph PIPELINE["🔁  ML Pipeline · DVC"]
         direction LR
-        INGEST["📥 Data\nIngestion"]
-        BASE["🏗️ Prepare\nBase Model\nVGG16 Frozen"]
-        TRAIN["🏋️ Model\nTraining\nFine-tuning"]
-        EVAL["📊 Model\nEvaluation\nMetrics + Scores"]
-
-        INGEST --> BASE --> TRAIN --> EVAL
+        INGEST["📥 Ingest"] --> BASE["🏗️ Base Model"] --> TRAIN["🏋️ Train"] --> EVAL["📊 Evaluate"]
     end
-
-    subgraph TRACKING["📈  Experiment Tracking  •  MLflow + DagsHub"]
-        MLFLOW["MLflow\nRuns + Metrics"]
-        REGISTRY["📋 Model Registry\nStaging → Production"]
-        DAGSHUB["DagsHub\nRemote Backend"]
-        PARAMS["params.yaml\nHyperparameters"]
-
-        PARAMS --> TRAIN
-        TRAIN --> MLFLOW
-        MLFLOW --> REGISTRY
-        MLFLOW <--> DAGSHUB
+    subgraph TRACKING["📈  MLflow + DagsHub"]
+        MLFLOW["Runs + Metrics"] --> REGISTRY["📋 Registry"]
+        MLFLOW <--> DAGSHUB["DagsHub"]
     end
-
-    subgraph SERVING["⚡  Serving Layer"]
-        FLASK["🌐 Flask REST API\nPOST /predict\nGET /health"]
-        MODEL_LOAD["📦 Load Production\nModel from Registry"]
-        DOCKER["🐳 Docker Container\nGunicorn WSGI"]
-
-        REGISTRY --> MODEL_LOAD --> FLASK --> DOCKER
+    subgraph SERVING["⚡  Serving"]
+        REGISTRY --> FLASK["🌐 Flask API"] --> DOCKER["🐳 Docker"]
     end
-
-    subgraph K8S["☸️  Kubernetes  •  Minikube"]
-        DEPLOY_K8S["📄 deployment.yaml\nReplicas + Port 8080"]
-        SVC["🌐 service.yaml\nNodePort Exposure"]
-        MINIKUBE["⚙️ Minikube Cluster\nLocal Orchestration"]
-
-        DOCKER --> DEPLOY_K8S --> MINIKUBE
-        SVC --> MINIKUBE
+    subgraph EDGE["🔒  Edge · Nginx + TLS"]
+        DOCKER --> NGINX["Nginx reverse proxy"] --> HTTPS["🔒 HTTPS · Let's Encrypt"]
     end
-
-    subgraph CICD["⚙️  CI/CD  •  GitHub Actions"]
+    subgraph K8S["☸️  Kubernetes · Minikube"]
+        DOCKER --> DEPLOY_K8S["📄 deployment.yaml"] --> MINIKUBE["⚙️ Cluster"]
+    end
+    subgraph CICD["⚙️  GitHub Actions"]
         direction LR
-        PUSH["git push\nmain"]
-        TEST["✅ pytest\nTest Suite"]
-        BUILD["🔨 Docker\nBuild"]
-        ECR["📤 Push to\nAWS ECR"]
-        DEPLOY["🚀 Deploy to\nAWS EC2"]
-
-        PUSH --> TEST --> BUILD --> ECR --> DEPLOY
+        PUSH["push"] --> TEST["✅ pytest"] --> BUILD["🔨 build"] --> ECR["📤 ECR"] --> DEPLOY["🚀 EC2"]
     end
-
-    DATA --> PIPELINE
+    DATA --> PIPELINE --> TRACKING
     MINIKUBE --> CICD
-
     style DATA fill:#0d1b2a,stroke:#00c9a7,color:#fff
     style PIPELINE fill:#1b263b,stroke:#415a77,color:#fff
     style TRACKING fill:#415a77,stroke:#778da9,color:#fff
     style SERVING fill:#1b263b,stroke:#00c9a7,color:#fff
+    style EDGE fill:#0d1b2a,stroke:#00c9a7,color:#fff
     style K8S fill:#0d1b2a,stroke:#326CE5,color:#fff
     style CICD fill:#0d1b2a,stroke:#415a77,color:#fff
 ```
+</details>
 
 ---
 
 ## 🔄 ML Pipeline (DVC)
 
-The full pipeline is defined in `dvc.yaml` with four sequential stages. DVC caches intermediate outputs and only re-runs stages whose inputs have changed — enabling fast, reproducible iteration.
+The pipeline is defined in `dvc.yaml` with four sequential stages. DVC caches intermediate outputs and only re-runs stages whose inputs have changed.
 
 ```mermaid
 graph LR
-    A["📥 data_ingestion\nDownload & store\nchest CT scan dataset"] -->
-    B["🏗️ prepare_base_model\nLoad VGG16\nFreeze base layers\nAttach custom head"] -->
-    C["🏋️ training\nFine-tune on CT data\nApply augmentation\nTrack with MLflow"] -->
-    D["📊 evaluation\nCompute accuracy & loss\nLog to MLflow Registry\nSave scores.json"]
-
+    A["📥 data_ingestion"] --> B["🏗️ prepare_base_model"] --> C["🏋️ training"] --> D["📊 evaluation"]
     style A fill:#0d1b2a,stroke:#00c9a7,color:#fff
     style B fill:#0d1b2a,stroke:#00c9a7,color:#fff
     style C fill:#0d1b2a,stroke:#00c9a7,color:#fff
@@ -178,44 +184,10 @@ graph LR
 ```
 
 ```bash
-# Reproduce the full pipeline (only changed stages re-run)
-dvc repro
-
-# View the DAG
-dvc dag
-
-# Run an experiment with different hyperparameters
-dvc exp run --set-param training.EPOCHS=20 --set-param training.LEARNING_RATE=0.0001
-dvc exp show
-
-# Sync artifacts with DVC remote
-dvc push   # Upload to remote storage
-dvc pull   # Download tracked artifacts
-```
-
----
-
-## ⚙️ CI/CD Pipeline
-
-Every push to `main` triggers the full deployment pipeline automatically — zero manual intervention.
-
-```mermaid
-sequenceDiagram
-    participant DEV as 👨‍💻 Developer
-    participant GH as 🐙 GitHub
-    participant GA as ⚙️ GitHub Actions
-    participant ECR as 🗄️ AWS ECR
-    participant EC2 as 🖥️ AWS EC2
-
-    DEV->>GH: git push main
-    GH->>GA: Trigger workflow
-    GA->>GA: ✅ Run pytest test suite
-    GA->>GA: 🔨 docker build -t chest-cancer-api .
-    GA->>ECR: 📤 Push tagged Docker image
-    GA->>EC2: 🔐 SSH into instance
-    EC2->>ECR: 📥 docker pull latest
-    EC2->>EC2: 🚀 docker run -p 8080:8080
-    EC2-->>DEV: ✅ Live on AWS
+dvc repro                 # reproduce full pipeline (only changed stages re-run)
+dvc dag                   # view the DAG
+dvc exp run --set-param training.EPOCHS=20   # run an experiment
+dvc push / dvc pull       # sync artifacts with remote
 ```
 
 ---
@@ -231,13 +203,14 @@ sequenceDiagram
 | **Experiment Tracking** | MLflow, DagsHub |
 | **Model Registry** | MLflow Model Registry (Staging → Production) |
 | **Data & Pipeline Versioning** | DVC (`dvc.yaml`, `dvc.lock`) |
-| **Configuration Management** | `config/config.yaml`, `params.yaml` |
-| **Testing** | pytest (unit + integration test suite) |
+| **Configuration** | `config/config.yaml`, `params.yaml` |
+| **Testing** | pytest (unit + integration) |
 | **API Serving** | Flask + Gunicorn, CORS enabled |
-| **Containerization** | Docker (pushed to Docker Hub) |
-| **Orchestration** | Kubernetes (Minikube) — Deployment + NodePort Service |
+| **Containerization** | Docker |
+| **Orchestration** | Kubernetes (Minikube) — Deployment + NodePort |
+| **Edge / TLS** | Nginx reverse proxy, Let's Encrypt (Certbot) |
 | **CI/CD** | GitHub Actions |
-| **Cloud** | AWS EC2 (compute), AWS ECR (image registry) |
+| **Cloud** | AWS EC2 (compute), AWS ECR (registry), Elastic IP |
 | **Language** | Python 3.10+ |
 
 </div>
@@ -247,71 +220,37 @@ sequenceDiagram
 ## 📁 Project Structure
 
 ```
-├── 📁 .dvc
-│   ├── ⚙️ .gitignore
-│   └── 📄 config
-├── 📁 .github
-│   └── 📁 workflows
-│       └── ⚙️ main.yaml
+├── 📁 .github/workflows/main.yaml
 ├── 📁 K8s
-│   ├── ⚙️ deployment.yaml
-│   └── ⚙️ service.yaml
-├── 📁 config
-│   └── ⚙️ config.yaml
-├── 📁 logs
-├── 📁 model
-│   └── 📄 model.h5
-├── 📁 research
-│   ├── 📄 01_data_ingestion.ipynb
-│   ├── 📄 02_prepare_base_model.ipynb
-│   ├── 📄 03_model_trainer.ipynb
-│   ├── 📄 04_model_evaluation_with_mlflow.ipynb
-│   └── 📄 trials.ipynb
-├── 📁 src
-│   └── 📁 cnnClassifier
-│       ├── 📁 components
-│       │   ├── 🐍 __init__.py
-│       │   ├── 🐍 data_ingestion.py
-│       │   ├── 🐍 model_evaluation_mlflow.py
-│       │   ├── 🐍 model_trainer.py
-│       │   └── 🐍 prepare_base_model.py
-│       ├── 📁 config
-│       │   ├── 🐍 __init__.py
-│       │   └── 🐍 configuration.py
-│       ├── 📁 constants
-│       │   └── 🐍 __init__.py
-│       ├── 📁 entity
-│       │   ├── 🐍 __init__.py
-│       │   └── 🐍 config_entity.py
-│       ├── 📁 pipeline
-│       │   ├── 🐍 __init__.py
-│       │   ├── 🐍 prediction.py
-│       │   ├── 🐍 stage_01_data_ingestion.py
-│       │   ├── 🐍 stage_02_prepare_base_model.py
-│       │   ├── 🐍 stage_03_trainer_model.py
-│       │   └── 🐍 stage_04_model_evaluation.py
-│       ├── 📁 utils
-│       │   ├── 🐍 __init__.py
-│       │   └── 🐍 common.py
-│       └── 🐍 __init__.py
-├── 📁 templates
-│   └── 🌐 index.html
-├── ⚙️ .dockerignore
-├── ⚙️ .dvcignore
-├── ⚙️ .gitignore
+│   ├── deployment.yaml
+│   └── service.yaml
+├── 📁 assets                     # README graphics (architecture.svg, results.svg)
+├── 📁 config/config.yaml
+├── 📁 model/model.h5
+├── 📁 research                   # exploratory notebooks (01–04 + trials)
+├── 📁 src/cnnClassifier
+│   ├── components/               # data_ingestion, prepare_base_model, model_trainer, evaluation
+│   ├── config/configuration.py
+│   ├── constants/
+│   ├── entity/config_entity.py
+│   ├── pipeline/                 # stage_01–04 + prediction.py
+│   └── utils/common.py
+├── 📁 templates/index.html       # PulmoAI web UI
 ├── 🐳 Dockerfile
-├── 📄 LICENSE
-├── 📝 README.md
-├── 🐍 app.py
-├── 📄 chest-classifier.pem
 ├── ⚙️ dvc.yaml
-├── 🐍 main.py
 ├── ⚙️ params.yaml
+├── 🐍 app.py  ·  main.py  ·  setup.py  ·  template.py
 ├── 📄 requirements.txt
 ├── ⚙️ scores.json
-├── 🐍 setup.py
-└── 🐍 template.py
+└── 📝 README.md
 ```
+
+> ⚠️ **Security note:** a `.pem` private key must **never** be committed. If a key file is in the repo history, remove it and rotate it:
+> ```bash
+> git rm --cached *.pem
+> echo "*.pem" >> .gitignore
+> ```
+> Anything pushed to a public repo should be treated as compromised — rotate the key pair in AWS.
 
 ---
 
@@ -321,25 +260,22 @@ sequenceDiagram
 
 ```mermaid
 graph TB
-    A["🖼️ Input\nChest CT Scan\n224 × 224 × 3\nBase64 Encoded"] -->
-    B["🔒 VGG16 Base\nPretrained on ImageNet\nFrozen Convolutional Layers\n13 Conv + 3 Pooling"] -->
-    C["🔓 Custom Head\nFlatten → Dense(256, ReLU)\nDropout(0.5) → Dense(4, Softmax)"] -->
-    D["📊 Output\nAdenocarcinoma\nLarge Cell Carcinoma\nSquamous Cell Carcinoma\nNormal"]
-
+    A["🖼️ Input · CT Scan · 224×224×3"] --> B["🔒 VGG16 Base · ImageNet · frozen conv layers"] --> C["🔓 Custom Head · Flatten → Dense → Dropout → Softmax"] --> D["📊 Output · Cancer / Normal"]
     style A fill:#0d1b2a,stroke:#00c9a7,color:#fff
     style B fill:#415a77,stroke:#778da9,color:#fff
     style C fill:#1b263b,stroke:#00c9a7,color:#fff
     style D fill:#0d1b2a,stroke:#00c9a7,color:#fff
 ```
 
-### Model Integration
-
 | Property | Detail |
 |---|---|
+| **Task** | Binary classification — Cancer / Normal |
 | **Format** | `.h5` (Keras SavedModel) |
 | **Loaded via** | `PredictionPipeline(self.filename)` |
-| **Input** | Base64-encoded CT scan image |
+| **Input** | Base64-encoded CT scan image (224×224×3) |
 | **Output** | Classification label |
+
+> 🔧 **Consistency check:** the task is binary, so the final layer and `params.yaml` should reflect that. If `CLASSES: 4` / `Dense(4)` is still in the code, update the classification head to 2 units (softmax) or 1 unit (sigmoid) so the code matches the stated behavior.
 
 ### Training Configuration (`params.yaml`)
 
@@ -355,22 +291,22 @@ prepare_base_model:
   IMAGE_SIZE: [224, 224, 3]
   INCLUDE_TOP: False
   WEIGHTS: imagenet
-  CLASSES: 4
+  CLASSES: 2        # binary: Cancer / Normal
 ```
 
 ---
 
 ## 📋 MLflow Model Registry
 
-Models are automatically promoted through environments based on evaluation thresholds. The evaluation stage logs the trained model to MLflow and registers it in the Model Registry.
+The evaluation stage logs the trained model to MLflow and registers a new version. Models are promoted through environments based on evaluation thresholds.
 
 ```mermaid
 stateDiagram-v2
     [*] --> Training : dvc repro
     Training --> Evaluation : Model trained
-    Evaluation --> Staging : Log to MLflow\nRegister version
-    Staging --> Production : Passes threshold\nManual / auto promotion
-    Production --> Serving : Flask API loads\nproduction model
+    Evaluation --> Staging : Log + register version
+    Staging --> Production : Passes threshold
+    Production --> Serving : Flask API loads production model
     Staging --> Archived : Below threshold
 ```
 
@@ -380,94 +316,51 @@ stateDiagram-v2
 
 ## 🌐 Backend API Reference
 
-**Base URL:** [http://13.221.125.15:8080](http://13.221.125.15:8080/)
+**Base URL:** [https://omar-pulmoai.duckdns.org](https://omar-pulmoai.duckdns.org) · CORS enabled · JSON messaging · served over HTTPS.
 
-The Flask backend has CORS enabled for frontend communication and uses JSON-based messaging throughout.
+### `GET /` — web UI for manual upload and prediction
 
-### `GET /`
+### `POST /predict` — classify a scan
 
-Returns the web UI for manual image upload and prediction.
-
----
-
-### `POST /predict`
-
-Accepts a base64-encoded CT scan image and returns a cancer classification.
-
-**Request:**
+**Request**
 ```json
-{
-  "image": "base64_string"
-}
+{ "image": "base64_string" }
 ```
-
-**Response:**
+**Response**
 ```json
-{
-  "prediction": "Cancer / Normal"
-}
+{ "prediction": "Cancer" }   // or "Normal"
 ```
-
-**cURL Example:**
+**cURL**
 ```bash
-curl -X POST http://13.221.125.15:8080/predict \
+curl -X POST https://omar-pulmoai.duckdns.org/predict \
   -H "Content-Type: application/json" \
   -d '{"image": "<base64_encoded_image>"}'
 ```
 
----
-
-### `GET /health`
-
-Used for monitoring and Kubernetes readiness/liveness probes.
-
-**Response:**
+### `GET /health` — for Kubernetes readiness/liveness probes
 ```json
-{
-  "status": "healthy"
-}
+{ "status": "healthy" }
 ```
-
----
-
-## 🖥️ Frontend UI
-
-A lightweight HTML interface served directly by Flask:
-
-- Upload a chest CT scan image
-- Trigger the `/predict` endpoint
-- Display the classification result in real time
 
 ---
 
 ## 🐳 Containerization (Docker)
 
-### Dockerfile Overview
-
 ```dockerfile
 FROM python:3.10-slim-bookworm
-
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
-
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
 ```
 
-The app is served via **Gunicorn** (4 workers) for production-grade WSGI performance.
-
-### Build & Push to Docker Hub
-
 ```bash
-# Build image locally
 docker build -t omarhatemmohamed/chest-cancer-app .
-
-# Push to Docker Hub
 docker push omarhatemmohamed/chest-cancer-app
 ```
 
-> **Final image size:** ≈ 2.6 GB
+> **Image size:** the production image is TensorFlow-heavy. A multi-stage build and dropping notebook/Jupyter deps from `requirements.txt` cut this substantially — see [Future Improvements](#-future-improvements).
 
 ---
 
@@ -475,238 +368,174 @@ docker push omarhatemmohamed/chest-cancer-app
 
 ### Why Minikube?
 
-Due to AWS EC2 quota limitations on the free-tier account (EC2 Fleet Request limits and EKS NodeGroup creation failures in `eu-west-1`), deployment was completed locally using **Minikube** as a production-equivalent Kubernetes environment. The full EKS architecture, manifests, and deployment workflow were designed and validated — the cluster is migration-ready once quota is approved.
-
-### Manifests
-
-**`deployment.yaml`** — defines the container image, exposed port (8080), and number of replicas.
-
-**`service.yaml`** — exposes the application externally via a `NodePort` service.
-
-### Deployment Steps
+AWS EC2 quota limits on the free-tier account (EC2 Fleet Request limits and EKS NodeGroup failures in `eu-west-1`) blocked EKS provisioning. Deployment was completed on **Minikube** as a production-equivalent local environment. The EKS manifests are unchanged and **migration-ready** once quota is approved.
 
 ```bash
-# Start the local cluster
 minikube start
-
-# Apply manifests
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+kubectl apply -f K8s/deployment.yaml
+kubectl apply -f K8s/service.yaml
+minikube service <service-name>       # auto-open in browser
 ```
 
-### Access the Application
-
-```bash
-# Auto-open in browser
-minikube service <service-name>
-```
-
-Or access directly via:
-
-```
-http://<minikube-ip>:<nodeport>
-```
-
-### Kubernetes Flow
-
-```mermaid
-graph LR
-    A["🐳 Docker Hub\nomarhatemmohamed/chest-cancer-app"] -->
-    B["📄 deployment.yaml\nReplicas + Port 8080"] -->
-    C["⚙️ Minikube Cluster\nkubectl apply"] -->
-    D["🌐 service.yaml\nNodePort Exposure"] -->
-    E["🌍 External Access\nhttp://minikube-ip:nodeport"]
-
-    style A fill:#0d1b2a,stroke:#00c9a7,color:#fff
-    style B fill:#0d1b2a,stroke:#326CE5,color:#fff
-    style C fill:#1b263b,stroke:#326CE5,color:#fff
-    style D fill:#0d1b2a,stroke:#326CE5,color:#fff
-    style E fill:#0d1b2a,stroke:#00c9a7,color:#fff
-```
+- **`deployment.yaml`** — container image, port 8080, replicas
+- **`service.yaml`** — external exposure via `NodePort`
 
 ---
 
-## 📊 Results
+## 🔒 Live Deployment (HTTPS)
 
-<div align="center">
+The app is live on AWS EC2 at **[https://omar-pulmoai.duckdns.org](https://omar-pulmoai.duckdns.org)**, served securely rather than on a raw IP:port.
 
-| Metric | Score |
-|---|---|
-| **Accuracy** | *See `scores.json` / MLflow run* |
-| **Loss** | *See `scores.json` / MLflow run* |
-| **Val Accuracy** | *See MLflow experiment dashboard* |
-| **Val Loss** | *See MLflow experiment dashboard* |
+```mermaid
+graph LR
+    U["🌍 User"] -->|HTTPS 443| N["🔒 Nginx reverse proxy<br/>Let's Encrypt TLS"]
+    N -->|proxy_pass :8080| D["🐳 Docker container<br/>Flask + Gunicorn"]
+    D --> M["🧠 VGG16 model"]
+    style U fill:#0d1b2a,stroke:#00c9a7,color:#fff
+    style N fill:#1b263b,stroke:#00c9a7,color:#fff
+    style D fill:#0d1b2a,stroke:#326CE5,color:#fff
+    style M fill:#0d1b2a,stroke:#00c9a7,color:#fff
+```
 
-</div>
+**How it's wired:**
 
-> 📈 Full experiment history, metric curves, and model version comparisons are tracked in **MLflow on DagsHub**:
-> [dagshub.com/omarhatem44/End-to-end-Chest-Cancer-Classification.mlflow](https://dagshub.com/omarhatem44/End-to-end-Chest-Cancer-Classification.mlflow/#/experiments)
+- A static **Elastic IP** keeps the public address stable across instance stop/start.
+- A free **DuckDNS** subdomain (`omar-pulmoai.duckdns.org`) points at the Elastic IP.
+- **Nginx** listens on ports 80/443 and reverse-proxies to the container on `127.0.0.1:8080`.
+- **Certbot** (Let's Encrypt) issues the TLS certificate and auto-redirects HTTP → HTTPS.
+- A **systemd timer** auto-renews the certificate before expiry.
 
-### Testing & Validation
+<details>
+<summary>🔧 Reproduce the HTTPS setup</summary>
 
-| Scenario | Status |
-|---|---|
-| UI image upload | ✅ |
-| API JSON response | ✅ |
-| Model inference | ✅ |
-| Docker container execution | ✅ |
-| Kubernetes service exposure | ✅ |
+```bash
+# open ports 80 + 443 in the EC2 Security Group first (source 0.0.0.0/0)
+
+sudo apt update && sudo apt install -y nginx certbot python3-certbot-nginx
+
+sudo tee /etc/nginx/sites-available/pulmoai >/dev/null <<'EOF'
+server {
+    listen 80;
+    server_name omar-pulmoai.duckdns.org;
+    location / {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+EOF
+
+sudo ln -s /etc/nginx/sites-available/pulmoai /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t && sudo systemctl restart nginx
+
+sudo certbot --nginx -d omar-pulmoai.duckdns.org --agree-tos -m you@example.com --redirect
+```
+</details>
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 ```
 Python 3.10+  |  Docker  |  DVC  |  kubectl  |  Minikube
 ```
 
 ```bash
-pip install dvc mlflow tensorflow
-```
-
-### 1. Clone the Repository
-
-```bash
+# 1. Clone
 git clone https://github.com/omarhatem44/End-to-end-Chest-Cancer-Classification-.git
 cd End-to-end-Chest-Cancer-Classification-
-```
 
-### 2. Install Dependencies
-
-```bash
+# 2. Install
 pip install -r requirements.txt
-```
 
-### 3. Pull Data & Model Artifacts
-
-```bash
+# 3. Pull data & model artifacts
 dvc pull
-```
 
-### 4. Reproduce the ML Pipeline
-
-```bash
+# 4. Reproduce the pipeline
 dvc repro
-```
 
-### 5. Run Locally with Docker
-
-```bash
+# 5. Run with Docker
 docker build -t chest-cancer-api .
 docker run -p 8080:8080 chest-cancer-api
-```
 
-### 6. Deploy on Kubernetes (Minikube)
-
-```bash
+# 6. (Optional) Deploy on Minikube
 minikube start
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-minikube service <service-name>
+kubectl apply -f K8s/deployment.yaml
+kubectl apply -f K8s/service.yaml
 ```
-
----
 
 ### 🌐 Live Demo
-
-The API is deployed and running live on AWS EC2:
-
-👉 **[http://13.221.125.15:8080/](http://13.221.125.15:8080/)**
-
-Upload a chest CT scan image and get a real-time cancer classification — no setup required.
+👉 **[https://omar-pulmoai.duckdns.org](https://omar-pulmoai.duckdns.org)** — upload a chest CT scan and get a real-time Cancer / Normal classification.
 
 ---
 
 ## 🔧 Development Workflow
 
-Follow this workflow when modifying any pipeline stage:
+When modifying any pipeline stage:
 
 ```
-1. Update config/config.yaml       → Add paths or artifact locations
-2. Update params.yaml              → Adjust hyperparameters
-3. Update entity/                  → Define or update dataclasses
-4. Update config/configuration.py  → Update ConfigurationManager
-5. Update components/              → Implement stage logic
-6. Update pipeline/                → Wire stage into pipeline
-7. Update main.py                  → Register stage in full runner
-8. Update dvc.yaml                 → Define stage deps/outputs
-9. Run: dvc repro                  → Execute updated pipeline
-10. Run: pytest                    → Verify test suite passes
+1. config/config.yaml       → paths / artifact locations
+2. params.yaml              → hyperparameters
+3. entity/                  → dataclasses
+4. config/configuration.py  → ConfigurationManager
+5. components/              → stage logic
+6. pipeline/                → wire stage in
+7. main.py                  → register in full runner
+8. dvc.yaml                 → deps/outputs
+9. dvc repro                → execute
+10. pytest                  → verify tests pass
 ```
 
 ---
 
 ## ⚠️ Challenges Faced
 
-### 1. Flask Route Issues
-- `/health` endpoint was initially missing → caused 404 errors in Kubernetes readiness probes
-- **Fix:** Added dedicated health check endpoint returning `{"status": "healthy"}`
+### AWS EKS Deployment Failure — EC2 vCPU Quota Exhausted
 
-### 2. HTTP Method Errors
-- `/predict` requires `POST` → frontend was sending an incorrect request method
-- **Fix:** Corrected the frontend request configuration
+The most operationally complex challenge of the project.
 
-### 3. Docker Issues
-- Docker daemon not running during initial build attempts
-- Missing `Dockerfile` discovered mid-deployment
-- Large final image size (~2.6 GB) due to TensorFlow dependencies
+**What happened:** provisioning an EKS cluster (`chest-prod-2`) in `eu-west-1` via `eksctl` created the control plane, but the managed node group entered `CREATE_FAILED` after ~35 minutes.
 
-### 4. AWS EKS Deployment Failure — EC2 vCPU Quota Exhausted
-
-This was the most operationally complex challenge of the project and resulted in hands-on experience with real AWS infrastructure limits and the support escalation process.
-
-**What happened:**
-
-When attempting to provision an EKS cluster (`chest-prod-2`) in `eu-west-1` using `eksctl`, the cluster control plane was created successfully via CloudFormation, but the managed node group (`ng-c2b5e0b7`) entered a `CREATE_FAILED` / `ROLLBACK_IN_PROGRESS` state after approximately 35 minutes of waiting.
-
-```
-Error: exceeded max wait time for StackCreateComplete waiter
-failed to create cluster "chest-prod-2"
-```
-
-**Root cause — identified via CloudFormation Events:**
-
+**Root cause (from CloudFormation events):**
 ```
 AsgInstanceLaunchFailures: You've reached your quota for maximum
 Fleet Requests for this account. Launching EC2 instance failed.
 ```
+The free-tier account had a **0 vCPU quota** for On-Demand Standard instances in `eu-west-1` — even a single `t3.micro` (2 vCPUs) couldn't launch.
 
-The free-tier AWS account had a **0 vCPU quota** for Running On-Demand Standard instances in `eu-west-1`. Even a single `t3.micro` node (2 vCPUs) could not be launched.
+**Debugging & resolution:**
+1. Read CloudFormation stack events to pinpoint the failing resource (`ManagedNodeGroup`) and error code
+2. Confirmed the applied quota was **0 vCPUs** under Service Quotas → EC2
+3. Submitted a quota increase (15 vCPUs); AWS opened support Case `177649325600882` for manual review
+4. Cleaned up the failed stacks: `eksctl delete cluster --name chest-prod-2 --region eu-west-1`
+5. Pivoted to **Minikube** — same manifests, no loss of deployment fidelity
 
-**Debugging steps taken:**
+**Takeaway:** cloud infrastructure limits are a real operational concern. Diagnosing this required reading CloudFormation events, understanding per-region quota scoping, and knowing the difference between automatic and manual quota approval paths.
 
-1. Inspected the CloudFormation stack events in the AWS console to identify the exact failure resource (`ManagedNodeGroup`) and error code (`AsgInstanceLaunchFailures`)
-2. Navigated to **Service Quotas → Amazon EC2 → Running On-Demand Standard (A, C, D, H, I, M, R, T, Z) instances**
-3. Confirmed the applied quota in `eu-west-1` was **0 vCPUs** with **0 utilization** — the bottleneck
-4. Submitted a quota increase request for **15 vCPUs** in `eu-west-1`
-5. AWS opened a support case (Case `177649325600882`) for manual review, as free-tier accounts do not receive automatic approval for quota increases
-6. Added a use-case justification to the support case to expedite review
+<details>
+<summary>Other challenges (Flask routes, HTTP methods, Docker, HTTPS)</summary>
 
-**Resolution:**
-
-While awaiting quota approval, the failed CloudFormation stacks were cleaned up:
-
-```bash
-eksctl delete cluster --name chest-prod-2 --region eu-west-1
-```
-
-Kubernetes deployment was then completed using **Minikube** as a production-equivalent local environment. The EKS manifests (`deployment.yaml`, `service.yaml`) remain unchanged and are fully compatible with EKS — migration requires only re-running the `eksctl create cluster` command once the quota is approved.
-
-**Key takeaway:** Cloud infrastructure limits are a real-world operational concern, not just a theoretical one. Diagnosing the failure required reading CloudFormation events, understanding AWS quota scoping per-region, and knowing the difference between automatic and manual quota approval paths.
+- **Missing `/health` endpoint** → 404 in K8s readiness probes → added dedicated health check
+- **`/predict` method mismatch** → frontend sent wrong HTTP method → corrected request config
+- **Docker** → daemon not running on first build; large final image from TensorFlow deps
+- **HTTPS** → raw IP:port isn't secure or shareable → added Nginx reverse proxy + Let's Encrypt on a DuckDNS domain, backed by a static Elastic IP
+</details>
 
 ---
 
 ## 🧠 Key Learnings
 
-- Difference between local vs cloud production deployment environments
-- Docker image size optimization challenges with heavy ML dependencies
-- Kubernetes resource management and NodePort service exposure patterns
-- Critical importance of health check endpoints in container orchestration
-- How to diagnose and handle AWS CloudFormation stack failures
-- How EC2 vCPU quotas are scoped per-region and how to request increases
-- How to pivot gracefully from cloud to local Kubernetes without losing deployment fidelity
+- Local vs cloud production deployment trade-offs
+- Docker image-size challenges with heavy ML dependencies
+- Kubernetes resource management and NodePort exposure patterns
+- Why health check endpoints matter in container orchestration
+- Diagnosing AWS CloudFormation stack failures and per-region vCPU quotas
+- Fronting a container with an Nginx reverse proxy and terminating TLS with Let's Encrypt
+- Using a static Elastic IP + dynamic DNS to keep a public endpoint stable
 
 ---
 
@@ -714,35 +543,12 @@ Kubernetes deployment was then completed using **Minikube** as a production-equi
 
 | Improvement | Description |
 |---|---|
-| **Multi-stage Docker build** | Reduce image size significantly below ~2.6 GB |
-| **Model on S3** | Store `.h5` in S3 instead of baking it into the container |
-| **Full CI/CD to K8s** | Extend GitHub Actions to auto-deploy to Kubernetes |
-| **AWS EKS migration** | Migrate from Minikube to EKS once eu-west-1 vCPU quota is approved |
-| **Monitoring** | Add Prometheus + Grafana dashboards for inference metrics |
-
----
-
-## 🧠 MLOps Skills Demonstrated
-
-<div align="center">
-
-| MLOps Pillar | Implementation |
-|---|---|
-| **Transfer Learning** | VGG16 pretrained on ImageNet, fine-tuned for 4-class medical imaging |
-| **Data Versioning** | DVC tracks raw CT data and processed artifacts |
-| **Pipeline Reproducibility** | `dvc repro` re-runs only changed stages from `dvc.yaml` |
-| **Experiment Tracking** | MLflow logs all runs: loss, accuracy, hyperparameters |
-| **Model Registry** | MLflow Model Registry with Staging → Production promotion |
-| **Configuration Management** | Centralized `config.yaml` + `params.yaml` with entity dataclasses |
-| **Test Suite** | pytest covering pipeline components and API endpoints |
-| **Model Serving** | Flask + Gunicorn API with base64 input, CORS, and health endpoint |
-| **Containerization** | Docker image built and pushed to Docker Hub (~2.6 GB) |
-| **Kubernetes Orchestration** | Minikube Deployment + NodePort Service with readiness probes |
-| **CI/CD Automation** | GitHub Actions: test → build → push ECR → deploy EC2 |
-| **Cloud Deployment** | Live inference on AWS EC2 with image from AWS ECR |
-| **Cloud Infrastructure Debugging** | Diagnosed EKS NodeGroup failure via CloudFormation events; navigated AWS quota system and support escalation |
-
-</div>
+| **Multi-stage Docker build** | Cut image size by dropping build/notebook deps from the runtime layer |
+| **Real confidence score** | Return the softmax probability from `/predict` so the UI shows a confidence bar |
+| **Model on S3** | Store `.h5` in S3 instead of baking it into the image |
+| **Full CI/CD to K8s** | Auto-deploy to Kubernetes from GitHub Actions |
+| **AWS EKS migration** | Move from Minikube to EKS once quota is approved |
+| **Monitoring** | Prometheus + Grafana dashboards for inference metrics |
 
 ---
 
@@ -765,7 +571,7 @@ Kubernetes deployment was then completed using **Minikube** as a production-equi
 
 <div align="center">
 
-*Built end-to-end with production MLOps practices — medical imaging, transfer learning, Docker, Kubernetes, and automated cloud deployment* 🩺🚀
+*Built end-to-end with production MLOps practices — medical imaging, transfer learning, Docker, Kubernetes, HTTPS, and automated cloud deployment* 🩺🚀
 
 ⭐ **Star this repo** if you found it useful!
 
