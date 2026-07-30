@@ -3,273 +3,393 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PULMOAI SCAN</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
+<title>PulmoAI — Chest CT Screening</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-    --primary: #00ffff;
-    --green: #22c55e;
-    --bg: #00040a;
+:root{
+    --bg:#0d1b2a;
+    --bg-2:#132b3f;
+    --panel:rgba(19,43,63,.6);
+    --line:#2a4460;
+    --teal:#00c9a7;
+    --blue:#00a3ff;
+    --text:#e6f1fa;
+    --muted:#8fb8d6;
+    --muted-2:#5b7a96;
+    --danger:#ff5a6a;
+    --ok:#00c9a7;
+    --warn:#ffb020;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(1100px 700px at 78% -8%, rgba(0,163,255,.10), transparent 60%),
+        radial-gradient(900px 700px at 12% 108%, rgba(0,201,167,.10), transparent 55%),
+        linear-gradient(160deg,#0d1b2a,#0a1622);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
 }
 
-body {
-    background: radial-gradient(circle at center, #020617, #000000);
-    color: #e2e8f0;
-    font-family: 'Segoe UI', sans-serif;
+/* ── Top bar ─────────────────────────────── */
+.topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;border-bottom:1px solid var(--line);
+    backdrop-filter:blur(6px);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{
+    width:34px;height:34px;border-radius:9px;
+    background:linear-gradient(135deg,var(--teal),var(--blue));
+    display:grid;place-items:center;color:#04121b;font-weight:700;
+    box-shadow:0 0 22px rgba(0,201,167,.35);
+}
+.brand h1{
+    font-family:'Space Grotesk',sans-serif;font-size:19px;
+    letter-spacing:.5px;margin:0;font-weight:700;
+}
+.brand span{color:var(--teal)}
+.status{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted-2);box-shadow:0 0 0 0 rgba(0,201,167,.5)}
+.dot.live{background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,201,167,.5)}70%{box-shadow:0 0 0 7px rgba(0,201,167,0)}100%{box-shadow:0 0 0 0 rgba(0,201,167,0)}}
+
+/* ── Layout ──────────────────────────────── */
+.wrap{
+    max-width:1120px;margin:0 auto;padding:40px 28px 56px;
+    display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;
+}
+.lede h2{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:34px;line-height:1.15;margin:0 0 14px;letter-spacing:-.5px;
+}
+.lede h2 em{font-style:normal;color:var(--teal)}
+.lede p{color:var(--muted);font-size:15px;line-height:1.6;margin:0 0 26px;max-width:44ch}
+
+/* ── Lungs stage ─────────────────────────── */
+.stage{position:relative;display:flex;justify-content:center;align-items:center;height:340px}
+.lungs-svg{width:300px;filter:drop-shadow(0 18px 40px rgba(0,0,0,.5))}
+.lung{
+    fill:rgba(0,201,167,.14);stroke:var(--teal);stroke-width:2;
+    transition:fill .6s ease,stroke .6s ease;
+    filter:drop-shadow(0 0 8px rgba(0,201,167,.35));
+}
+.trachea{fill:var(--teal);opacity:.85;transition:fill .6s ease}
+.left{transform-origin:82px 110px;animation:bl 3.6s ease-in-out infinite}
+.right{transform-origin:118px 110px;animation:br 3.6s ease-in-out infinite}
+@keyframes bl{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes br{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.stage.result-cancer .lung{fill:rgba(255,90,106,.22);stroke:var(--danger);filter:drop-shadow(0 0 12px rgba(255,90,106,.45))}
+.stage.result-cancer .trachea{fill:var(--danger)}
+.stage.result-normal .lung{fill:rgba(0,201,167,.18);stroke:var(--teal)}
+.scanline{
+    position:absolute;left:50%;top:0;transform:translateX(-50%);
+    width:220px;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--blue),transparent);
+    opacity:0;
+}
+.stage.scanning .scanline{opacity:.9;animation:scan 1.6s ease-in-out infinite}
+@keyframes scan{0%{top:12%}50%{top:82%}100%{top:12%}}
+@media(prefers-reduced-motion:reduce){
+    .left,.right,.stage.scanning .scanline{animation:none}
 }
 
-/* Layout */
-.main {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
+/* ── Card ────────────────────────────────── */
+.card{
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    padding:22px;backdrop-filter:blur(18px);
+    box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
+.card .eyebrow{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted-2);margin-bottom:14px}
 
-/* Card */
-.card-custom {
-    background: rgba(10,15,25,0.5);
-    backdrop-filter: blur(25px);
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 
-        0 0 60px rgba(0,255,255,0.05),
-        inset 0 0 10px rgba(255,255,255,0.02);
+.drop{
+    border:1.5px dashed var(--line);border-radius:14px;height:230px;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;
+    background:rgba(0,0,0,.25);cursor:pointer;transition:border-color .2s,background .2s;
+    text-align:center;overflow:hidden;position:relative;
 }
+.drop:hover,.drop.drag{border-color:var(--teal);background:rgba(0,201,167,.05)}
+.drop img{max-width:100%;max-height:100%;object-fit:contain;display:none}
+.drop.has-img{border-style:solid;padding:0}
+.drop.has-img .hint{display:none}
+.drop.has-img img{display:block}
+.hint{color:var(--muted);font-size:14px}
+.hint small{display:block;color:var(--muted-2);font-size:12px;margin-top:4px}
+.upl-ico{width:38px;height:38px;stroke:var(--teal);fill:none;stroke-width:1.6}
 
-/* SVG Lungs */
-.lungs-container {
-    width: 350px;
-    display: flex;
-    justify-content: center;
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{
+    flex:1;padding:12px;border-radius:11px;font-family:'Space Grotesk',sans-serif;
+    font-weight:600;font-size:14px;cursor:pointer;transition:all .18s;
+    border:1px solid var(--line);background:transparent;color:var(--text);
 }
+.btn:hover:not(:disabled){border-color:var(--teal);background:rgba(0,201,167,.06)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{
+    border:none;color:#04121b;
+    background:linear-gradient(135deg,var(--teal),var(--blue));
+    box-shadow:0 8px 24px rgba(0,201,167,.25);
+}
+.btn.primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(4,18,27,.35);border-top-color:#04121b;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:7px}
+@keyframes sp{100%{transform:rotate(360deg)}}
 
-.lungs-svg {
-    width: 100%;
-}
+/* ── Result ──────────────────────────────── */
+.result{margin-top:16px;border-radius:12px;border:1px solid var(--line);padding:16px;background:rgba(0,0,0,.3);display:none}
+.result.show{display:block;animation:rise .35s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.result .row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.verdict{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;display:flex;align-items:center;gap:9px}
+.verdict.cancer{color:var(--danger)}
+.verdict.normal{color:var(--teal)}
+.pill{font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.conf-wrap{margin-top:12px}
+.conf-label{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.conf-track{height:8px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+.conf-fill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .6s ease}
+.conf-fill.cancer{background:linear-gradient(90deg,#ff5a6a,#ff8a4c)}
 
-.lung {
-    fill: rgba(0,255,255,0.15);
-    stroke: #00ffff;
-    stroke-width: 1.5;
-    filter: drop-shadow(0 0 10px #00ffff);
-}
+.msg{margin-top:12px;font-size:13px;padding:10px 12px;border-radius:9px;display:none}
+.msg.show{display:block}
+.msg.err{background:rgba(255,90,106,.1);border:1px solid rgba(255,90,106,.3);color:#ffb3ba}
+.msg.info{background:rgba(0,163,255,.08);border:1px solid rgba(0,163,255,.25);color:#a9d8ff}
 
-/* breathing */
-.left {
-    transform-origin: right center;
-    animation: breatheLeft 3s infinite ease-in-out;
+/* ── Disclaimer ──────────────────────────── */
+.disclaimer{
+    max-width:1120px;margin:0 auto;padding:0 28px 40px;
 }
-.right {
-    transform-origin: left center;
-    animation: breatheRight 3s infinite ease-in-out;
+.disclaimer div{
+    border:1px solid rgba(255,176,32,.25);background:rgba(255,176,32,.06);
+    border-radius:12px;padding:14px 18px;font-size:12.5px;color:#e6cfa0;line-height:1.55;
+    display:flex;gap:12px;align-items:flex-start;
 }
+.disclaimer svg{flex-shrink:0;stroke:var(--warn);fill:none;stroke-width:1.6;width:20px;height:20px;margin-top:1px}
+.disclaimer b{color:#ffd98a}
 
-@keyframes breatheLeft {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-}
-@keyframes breatheRight {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-}
-
-/* Upload */
-.image-part {
-    border: 1px solid rgba(0,255,255,0.2);
-    border-radius: 10px;
-    height: 250px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000;
-    margin-bottom: 15px;
-}
-.image-part img {
-    max-width: 100%;
-    max-height: 100%;
-}
-
-/* Buttons */
-.btn-tech {
-    border: 1px solid var(--primary);
-    color: var(--primary);
-    background: transparent;
-    border-radius: 10px;
-}
-.btn-tech:hover {
-    background: rgba(0,255,255,0.1);
-    box-shadow: 0 0 20px var(--primary);
-}
-
-.btn-predict {
-    border-color: var(--green);
-    color: var(--green);
-}
-.btn-predict:hover {
-    background: rgba(34,197,94,0.1);
-    box-shadow: 0 0 20px var(--green);
-}
-
-/* Result */
-.result-box {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 10px;
-    background: #000;
-    border: 1px solid rgba(0,255,255,0.2);
-}
-
-/* Loader */
-#loading {
-    display:none;
-    position:fixed;
-    inset:0;
-    background: rgba(0,0,0,0.9);
-    z-index:999;
-}
-.loader {
-    border: 6px solid #222;
-    border-top: 6px solid #00ffff;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    margin:auto;
-    margin-top:20%;
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    100% { transform: rotate(360deg);}
+@media(max-width:900px){
+    .wrap{grid-template-columns:1fr;gap:8px;padding-top:24px}
+    .stage{height:240px;order:-1}.lungs-svg{width:220px}
+    .lede h2{font-size:27px}
 }
 </style>
 </head>
-
 <body>
 
-<div class="container main">
-<div class="row w-100">
+<div class="topbar">
+    <div class="brand">
+        <div class="mark">P</div>
+        <h1>Pulmo<span>AI</span></h1>
+    </div>
+    <div class="status">
+        <span class="dot" id="apiDot"></span>
+        <span id="apiStatus">Checking API…</span>
+    </div>
+</div>
 
-    <!-- LEFT: LUNGS -->
-    <div class="col-lg-6 d-flex justify-content-center align-items-center">
-        <div class="lungs-container">
-
-            <svg viewBox="0 0 200 200" class="lungs-svg">
-
-                <!-- LEFT LUNG -->
-                <path class="lung left"
-                    d="M90 40 C60 40, 40 80, 50 120 C60 160, 90 160, 95 130 L95 60 Z"/>
-
-                <!-- RIGHT LUNG -->
-                <path class="lung right"
-                    d="M110 40 C140 40, 160 80, 150 120 C140 160, 110 160, 105 130 L105 60 Z"/>
-
-                <!-- TRACHEA -->
-                <rect x="95" y="20" width="10" height="30" fill="#00ffff"/>
-
+<div class="wrap">
+    <div class="lede">
+        <h2>Chest CT screening,<br><em>in seconds.</em></h2>
+        <p>Upload a chest CT scan and the fine-tuned VGG16 model flags it as
+           <strong>Cancer</strong> or <strong>Normal</strong>. Built as a decision-support
+           aid — always confirm findings with a radiologist.</p>
+        <div class="stage" id="stage">
+            <div class="scanline"></div>
+            <svg viewBox="0 0 200 200" class="lungs-svg" aria-hidden="true">
+                <rect class="trachea" x="95" y="20" width="10" height="34" rx="3"/>
+                <path class="lung left"  d="M90 44 C58 46, 38 84, 50 124 C60 158, 90 160, 95 132 L95 60 Z"/>
+                <path class="lung right" d="M110 44 C142 46, 162 84, 150 124 C140 158, 110 160, 105 132 L105 60 Z"/>
             </svg>
-
         </div>
     </div>
 
-    <!-- RIGHT: UI -->
-    <div class="col-lg-6 text-center">
+    <div class="card">
+        <div class="eyebrow">CT Image Analysis</div>
 
-        <h2 class="mb-3">🧠 PULMOAI SCAN</h2>
-        <p class="text-secondary mb-4">AI Chest Cancer Detection System</p>
+        <label class="drop" id="drop" for="fileinput" tabindex="0">
+            <svg class="upl-ico" viewBox="0 0 24 24"><path d="M12 16V4m0 0L8 8m4-4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+            <span class="hint">Drop a CT scan here or click to browse<small>JPG or PNG · 224×224 recommended</small></span>
+            <img id="preview" alt="CT scan preview">
+        </label>
+        <input type="file" id="fileinput" accept="image/*" hidden>
 
-        <div class="card-custom">
+        <div class="actions">
+            <button class="btn" id="clearBtn" onclick="clearImage()" disabled>Clear</button>
+            <button class="btn primary" id="predictBtn" onclick="predict()" disabled>Analyze scan</button>
+        </div>
 
-            <div class="image-part">
-                <img id="preview" style="display:none;">
-                <span id="placeholder">Upload CT Image</span>
+        <div class="msg" id="msg"></div>
+
+        <div class="result" id="result">
+            <div class="row">
+                <div class="verdict" id="verdict"></div>
+                <span class="pill" id="source"></span>
             </div>
-
-            <input type="file" id="fileinput" class="form-control mb-3">
-
-            <div class="d-flex gap-2">
-                <button class="btn btn-tech w-50" onclick="uploadImage()">Upload</button>
-                <button class="btn btn-tech btn-predict w-50" onclick="predict()">Predict</button>
+            <div class="conf-wrap" id="confWrap">
+                <div class="conf-label"><span>Confidence</span><span id="confVal"></span></div>
+                <div class="conf-track"><div class="conf-fill" id="confFill"></div></div>
             </div>
-
-            <!-- RESULT -->
-            <div id="result"></div>
-
         </div>
     </div>
-
-</div>
 </div>
 
-<div id="loading">
-    <div class="loader"></div>
+<div class="disclaimer">
+    <div>
+        <svg viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <span><b>Not a medical diagnosis.</b> PulmoAI is a research and decision-support tool.
+        Its output must not be used as the sole basis for any clinical decision. All results
+        should be reviewed and confirmed by a qualified radiologist or physician.</span>
+    </div>
 </div>
 
 <script>
+// ── Config ────────────────────────────────
+// Set to your deployed endpoint, or leave "" to use same-origin /predict.
+const API_BASE = "";                       // e.g. "http://13.221.125.15:8080"
+const PREDICT_URL = (API_BASE || "") + "/predict";
+const HEALTH_URL  = (API_BASE || "") + "/health";
+
 let base_data = "";
 
-/* Upload */
-function uploadImage() {
-    const file = document.getElementById("fileinput").files[0];
-    if (!file) return alert("Upload image first");
+// ── API health check (drives the status dot) ──
+(async function checkHealth(){
+    const dot = document.getElementById("apiDot");
+    const label = document.getElementById("apiStatus");
+    try{
+        const r = await fetch(HEALTH_URL, {method:"GET"});
+        if(r.ok){ dot.classList.add("live"); label.textContent = "API connected"; }
+        else throw 0;
+    }catch(_){
+        label.textContent = "API offline — demo mode";
+    }
+})();
 
+// ── File handling ─────────────────────────
+const drop = document.getElementById("drop");
+const input = document.getElementById("fileinput");
+const preview = document.getElementById("preview");
+
+input.addEventListener("change", e => handleFile(e.target.files[0]));
+drop.addEventListener("keydown", e => { if(e.key==="Enter"||e.key===" "){ e.preventDefault(); input.click(); }});
+["dragover","dragenter"].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault(); drop.classList.add("drag");}));
+["dragleave","drop"].forEach(ev => drop.addEventListener(ev, e => {e.preventDefault(); drop.classList.remove("drag");}));
+drop.addEventListener("drop", e => { if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+
+function handleFile(file){
+    if(!file || !file.type.startsWith("image/")){ return showMsg("Please choose a JPG or PNG image.", "err"); }
+    hideMsg(); resetResult();
     const reader = new FileReader();
-    reader.onload = function(e) {
-        document.getElementById("preview").src = e.target.result;
-        document.getElementById("preview").style.display = "block";
-        document.getElementById("placeholder").style.display = "none";
-
+    reader.onload = e => {
+        preview.src = e.target.result;
+        drop.classList.add("has-img");
         const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            base_data = canvas.toDataURL("image/jpeg")
-                .replace(/^data:image.+;base64,/, "");
+        img.onload = () => {
+            const c = document.createElement("canvas");
+            c.width = img.width; c.height = img.height;
+            c.getContext("2d").drawImage(img,0,0);
+            base_data = c.toDataURL("image/jpeg").replace(/^data:image.+;base64,/, "");
+            document.getElementById("predictBtn").disabled = false;
+            document.getElementById("clearBtn").disabled = false;
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-/* Predict */
-function predict() {
-    if (!base_data) return alert("Upload image first");
-
-    document.getElementById("loading").style.display = "block";
-
-    // ⚠️ اربطه بالـ API الحقيقي هنا
-    setTimeout(() => {
-
-        document.getElementById("loading").style.display = "none";
-
-        const isCancer = Math.random() > 0.5;
-
-        // تغيير لون الرئة حسب النتيجة
-        document.querySelectorAll('.lung').forEach(l => {
-            if(isCancer){
-                l.style.fill = "rgba(255,0,0,0.4)";
-                l.style.stroke = "red";
-            } else {
-                l.style.fill = "rgba(0,255,255,0.2)";
-                l.style.stroke = "#00ffff";
-            }
-        });
-
-        document.getElementById("result").innerHTML = `
-            <div class="result-box">
-                <h4 style="color:${isCancer ? 'red' : '#22c55e'};">
-                    ${isCancer ? '⚠ Cancer Suspected' : '✔ Normal'}
-                </h4>
-                <p>Confidence: ${(Math.random()*10+90).toFixed(2)}%</p>
-            </div>
-        `;
-
-    }, 2000);
+function clearImage(){
+    base_data = ""; input.value = "";
+    preview.src = ""; drop.classList.remove("has-img");
+    document.getElementById("predictBtn").disabled = true;
+    document.getElementById("clearBtn").disabled = true;
+    resetResult(); hideMsg();
 }
-</script>
 
+// ── Predict (real API → demo fallback) ────
+async function predict(){
+    if(!base_data) return showMsg("Upload a scan first.", "err");
+    const btn = document.getElementById("predictBtn");
+    const stage = document.getElementById("stage");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spin"></span>Analyzing…';
+    stage.className = "stage scanning";
+    hideMsg();
+
+    let result = null, viaDemo = false;
+    try{
+        const resp = await fetch(PREDICT_URL, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({ image: base_data })
+        });
+        if(!resp.ok) throw new Error("status " + resp.status);
+        const data = await resp.json();
+        result = parseResponse(data);
+    }catch(err){
+        // Graceful fallback so the UI is demoable without a backend.
+        viaDemo = true;
+        result = demoResult();
+        showMsg("Live API unavailable — showing a simulated result for demo purposes only.", "info");
+    }
+
+    stage.className = "stage";
+    btn.disabled = false;
+    btn.textContent = "Analyze scan";
+    renderResult(result, viaDemo);
+}
+
+// Accepts a few common response shapes from your Flask app.
+function parseResponse(data){
+    // shape A: { "prediction": "Cancer" }
+    // shape B: [ { "image": "Cancer" } ]
+    // shape C: { "prediction": "Cancer", "confidence": 0.91 }
+    let label, conf = null;
+    if(Array.isArray(data) && data[0]) label = data[0].image ?? data[0].prediction;
+    else label = data.prediction ?? data.result ?? data.class;
+    if(typeof data.confidence === "number") conf = data.confidence;
+    const isCancer = /cancer|adeno|carcinoma|malignant|positive/i.test(String(label));
+    return { isCancer, label: isCancer ? "Cancer" : "Normal", conf };
+}
+
+function demoResult(){
+    const isCancer = Math.random() > 0.5;
+    return { isCancer, label: isCancer ? "Cancer" : "Normal", conf: null };
+}
+
+// ── Render ────────────────────────────────
+function renderResult(r, viaDemo){
+    const stage = document.getElementById("stage");
+    const result = document.getElementById("result");
+    const verdict = document.getElementById("verdict");
+    const source = document.getElementById("source");
+    const confWrap = document.getElementById("confWrap");
+    const confFill = document.getElementById("confFill");
+    const confVal = document.getElementById("confVal");
+
+    stage.className = "stage " + (r.isCancer ? "result-cancer" : "result-normal");
+    verdict.className = "verdict " + (r.isCancer ? "cancer" : "normal");
+    verdict.textContent = (r.isCancer ? "⚠  Cancer suspected" : "✓  Normal");
+    source.textContent = viaDemo ? "Simulated" : "Model output";
+
+    if(typeof r.conf === "number"){
+        const pct = Math.round(r.conf * (r.conf <= 1 ? 100 : 1));
+        confVal.textContent = pct + "%";
+        confFill.className = "conf-fill " + (r.isCancer ? "cancer" : "");
+        confFill.style.width = pct + "%";
+        confWrap.style.display = "block";
+    }else{
+        // Don't fabricate a confidence number when the model didn't return one.
+        confWrap.style.display = "none";
+    }
+    result.classList.add("show");
+}
+
+function resetResult(){
+    document.getElementById("result").classList.remove("show");
+    document.getElementById("stage").className = "stage";
+}
+function showMsg(t,kind){const m=document.getElementById("msg");m.textContent=t;m.className="msg show "+kind;}
+function hideMsg(){document.getElementById("msg").className="msg";}
+</script>
 </body>
 </html>
